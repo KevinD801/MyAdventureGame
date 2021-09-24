@@ -14,7 +14,7 @@ namespace MyAdventureGame
         private Entity _currentEnemy;
         private string _playerName;
 
-        bool _gameOver = false;
+        
         public void Run()
         {
             Start();
@@ -45,7 +45,9 @@ namespace MyAdventureGame
         {
             switch (_currentScene)
             {
-
+                case 0:
+                    GetPlayerName();
+                    break;
             }
         }
 
