@@ -43,6 +43,10 @@ namespace MyAdventureGame
         private Item[] _wizardItems;
         private Item[] _knightItems;
 
+
+        /// <summary>
+        /// Function that starts the main game loop
+        /// </summary>
         public void Run()
         {
             Start();
@@ -55,8 +59,10 @@ namespace MyAdventureGame
             End();
         }
 
-
-        void Start()
+        /// <summary>
+        /// Function used to initialize any starting values by default
+        /// </summary>
+        public void Start()
         {
             _gameOver = false;
             _currentScene = 0;
@@ -65,6 +71,9 @@ namespace MyAdventureGame
             InitializeItems();
         }
 
+        /// <summary>
+        /// Initialize Player items from start. 
+        /// </summary>
         public void InitializeItems()
         {
             // Wizard items
@@ -80,6 +89,9 @@ namespace MyAdventureGame
             _knightItems = new Item[] { masterSword, shield };
         }
 
+        /// <summary>
+        /// Initialize Enemies from start. 
+        /// </summary>
         public void InitializeEnemies()
         {
             _currentEnemyIndex = 0;
@@ -99,18 +111,26 @@ namespace MyAdventureGame
             _currentEnemy = _enemies[_currentEnemyIndex];
         }
 
-
-        void Update()
+        /// <summary>
+        /// This function is called every time the game loops.
+        /// </summary>
+        public void Update()
         {
             DisplayCurrentScene();
         }
 
-        void End()
+        /// <summary>
+        /// This function is called before the applications closes
+        /// </summary>
+        public void End()
         {
             Console.WriteLine("Goodbye, Adventurer.");
         }
 
-        void DisplayCurrentScene()
+        /// <summary>
+        /// Calls the appropriate function(s) based on the current scene index
+        /// </summary>
+        public void DisplayCurrentScene()
         {
             switch (_currentScene)
             {
@@ -138,21 +158,9 @@ namespace MyAdventureGame
                     break;
             }
         }
-        void AfterBattle()
-        {
-            int input = GetInput("You defeated all monster, but one remained can you solve this riddle.",
-                "Yes", "No");
 
-            if (input == 0)
-            {
-                Console.WriteLine("You surrender into depression." + "\n");
-                _currentScene = Scene.RESTART;
-            }
-            else if (input == 1)
-            {
-                _currentScene++;
-            }
-        }
+
+
         /// <summary>
         /// Displays the menu that allows the player to start the game 
         /// again or quit the game
@@ -232,6 +240,10 @@ namespace MyAdventureGame
             }
         }
 
+        /// <summary>
+        /// Gets the players choice of character. Updates player stats based on
+        /// the character chosen.
+        /// </summary>
         public void CharacterSelection()
         {
             int input = GetInput("Nice to meet you " + _playerName + ". Please select a character.",
@@ -264,6 +276,27 @@ namespace MyAdventureGame
                 // Items: Master Sword and Shield
 
                 _player = new Player(_playerName, 75, 25, 15, _knightItems, "Knight");
+                _currentScene++;
+            }
+        }
+
+        /// <summary>
+        /// Getting user to be engage into story. 
+        /// </summary>
+        void Story()
+        {
+            int input = GetInput("The world went dark, chaos reign over corrupt land, people has been slaughter.",
+                "Surrender", "Fight");
+
+            if (input == 0)
+            {
+                Console.WriteLine("You surrender into depression like there no hope enemies notice your presence you been slained." + "\n");
+                _currentScene = Scene.RESTART;
+            }
+            else if (input == 1)
+            {
+                Console.WriteLine("Stand to your ground to fight take back what dear to you." + "\n" +
+                    "I hope you know what to do. And now enemies face toward you. Prepare to fight! \n");
                 _currentScene++;
             }
         }
@@ -322,21 +355,6 @@ namespace MyAdventureGame
             return inputReceived;
         }
 
-        void Story()
-        {
-            int input = GetInput("The world went dark, chaos reign over corrupt land, people has been slaughter.",
-                "Surrender", "Fight");
-
-            if (input == 0)
-            {
-                Console.WriteLine("You surrender into depression." + "\n");
-                _currentScene = Scene.RESTART;
-            }
-            else if (input == 1)
-            {
-                _currentScene++;
-            }
-        }
 
 
         public void Save()
@@ -509,9 +527,29 @@ namespace MyAdventureGame
             damageDealt = _currentEnemy.Attack(_player);
             Console.WriteLine("The " + _currentEnemy.Name + " dealt " + damageDealt, " damage!");
 
-
+            
             Console.ReadKey(true);
             Console.Clear();
+        }
+
+        /// <summary>
+        /// AfterBattle supposed to do is when Battle function end 
+        /// </summary>
+        void AfterBattle()
+        {
+            int input = GetInput("You defeated all monster, but one remained can you solve this riddle.",
+                "Yes", "No");
+
+            if (input == 0)
+            {
+                _currentScene++;
+            }
+            else if (input == 1)
+            {
+                Console.WriteLine("You ingored riddle." + "\n");
+                _currentScene = Scene.RESTART;
+
+            }
         }
 
         /// <summary>
