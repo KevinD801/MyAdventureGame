@@ -12,6 +12,7 @@ namespace MyAdventureGame
         SELECTION,
         STORY,
         BATTLE,
+        AFTERBATTLE,
         RESTART
     }
     public struct Item
@@ -66,15 +67,15 @@ namespace MyAdventureGame
 
         public void InitializeItems()
         {
-            //Wizard items
+            // Wizard items
             Item fireCaster = new Item { Name = "Fire Caster", StatBoost = 14, Type = ItemType.ATTACK };
             Item forceShield = new Item { Name = "Force Shield", StatBoost = 15, Type = ItemType.DEFENSE };
 
-            //Knight items
+            // Knight items
             Item masterSword = new Item { Name = "Master Sword", StatBoost = 18, Type = ItemType.ATTACK };
             Item shield = new Item { Name = "Shield", StatBoost = 16, Type = ItemType.DEFENSE };
 
-            //Initialize arrays
+            // Initialize arrays
             _wizardItems = new Item[] { fireCaster, forceShield };
             _knightItems = new Item[] { masterSword, shield };
         }
@@ -83,13 +84,17 @@ namespace MyAdventureGame
         {
             _currentEnemyIndex = 0;
 
-            Entity soul = new Entity("Soul", 5, 15, 57);
+            Entity apathy = new Entity("Apathy", 13, 6, 10);
 
-            Entity fear = new Entity("Fear", 4, 17, 59);
+            Entity fear = new Entity("Fear", 16, 9, 10);
 
-            Entity reget = new Entity("Regret", 10, 55, 30);
+            Entity reget = new Entity("Regret", 18, 10, 10);
 
-            _enemies = new Entity[] { soul, fear, reget };
+            Entity pain = new Entity("Pain", 20, 15, 10);
+
+            Entity dispair = new Entity("Dispair", 25, 18, 14);
+
+            _enemies = new Entity[] { apathy, fear, reget, pain, dispair };
 
             _currentEnemy = _enemies[_currentEnemyIndex];
         }
@@ -119,18 +124,35 @@ namespace MyAdventureGame
                     CharacterSelection();
                     break;
                 case Scene.STORY:
-                    Story1();
+                    Story();
                     break;
                 case Scene.BATTLE:
                     Battle();
                     CheckBattleResults();
+                    break;
+                case Scene.AFTERBATTLE:
+                    AfterBattle();
                     break;
                 case Scene.RESTART:
                     DisplayRestartMenu();
                     break;
             }
         }
+        void AfterBattle()
+        {
+            int input = GetInput("You defeated all monster, but one remained can you solve this riddle.",
+                "Yes", "No");
 
+            if (input == 0)
+            {
+                Console.WriteLine("You surrender into depression." + "\n");
+                _currentScene = Scene.RESTART;
+            }
+            else if (input == 1)
+            {
+                _currentScene++;
+            }
+        }
         /// <summary>
         /// Displays the menu that allows the player to start the game 
         /// again or quit the game
@@ -139,8 +161,10 @@ namespace MyAdventureGame
         {
             int choice = GetInput("Play Again?", "Yes", "No");
 
+            // Restart the player to the start
             if (choice == 0)
             {
+                // Reset enemies values and set player the beginning of scene
                 _currentScene = 0;
                 InitializeEnemies();
             }
@@ -166,7 +190,6 @@ namespace MyAdventureGame
             {
                 _currentScene++;
             }
-
             else if (choice == 1)
             {
                 if (Load())
@@ -221,12 +244,12 @@ namespace MyAdventureGame
             {
                 // Display for Wizard Stats
 
-                // Player Health = 50f;
-                // Player AttackPower = 25f;
+                // Player Health = 60f;
+                // Player AttackPower = 28f;
                 // Player DefensePower = 5f;
                 // Items: Fire Caster and Force Shield
 
-                _player = new Player(_playerName, 50, 25, 5, _wizardItems, "Wizard");
+                _player = new Player(_playerName, 60, 28, 5, _wizardItems, "Wizard");
                 _currentScene++;
             }
 
@@ -236,11 +259,11 @@ namespace MyAdventureGame
                 // Display for Knight Stats
 
                 // Player Health = 75f;
-                // Player AttackPower = 15f;
-                // Player DefensePower = 10f;
-                // Items: 
+                // Player AttackPower = 25f;
+                // Player DefensePower = 15f;
+                // Items: Master Sword and Shield
 
-                _player = new Player(_playerName, 75, 15, 10, _knightItems, "Knight");
+                _player = new Player(_playerName, 75, 25, 15, _knightItems, "Knight");
                 _currentScene++;
             }
         }
@@ -299,16 +322,15 @@ namespace MyAdventureGame
             return inputReceived;
         }
 
-        void Story1()
+        void Story()
         {
-            int input = GetInput("Have you think are lost to depression to this world.",
-                "Yes", "No");
-
+            int input = GetInput("The world went dark, chaos reign over corrupt land, people has been slaughter.",
+                "Surrender", "Fight");
 
             if (input == 0)
             {
-                _gameOver = true;
                 Console.WriteLine("You surrender into depression." + "\n");
+                _currentScene = Scene.RESTART;
             }
             else if (input == 1)
             {
@@ -319,17 +341,17 @@ namespace MyAdventureGame
 
         public void Save()
         {
-            //Create a new stream writer
+            // Create a new stream writer
             StreamWriter writer = new StreamWriter("SaveData.txt");
 
-            //Save current enemy index
+            // Save current enemy index
             writer.WriteLine(_currentEnemyIndex);
 
-            //Save player and enemy stats
+            // Save player and enemy stats
             _player.Save(writer);
             _currentEnemy.Save(writer);
 
-            //Close writer when done saving
+            // Close writer when done saving
             writer.Close();
         }
 
@@ -435,14 +457,17 @@ namespace MyAdventureGame
             DisplayStats(_currentEnemy);
 
             int choice = GetInput("A " + _currentEnemy.Name + " stands in front of you! What will you do?", 
-                "Attack", "Equip Item", "Remove current item", "Save");
+                "Attack", "Equip Item", "Unequip Item", "Save");
 
+            // Attack
             if (choice == 0)
             {
                 // The player attacks the enemy
                 damageDealt = _player.Attack(_currentEnemy);
                 Console.WriteLine("You dealt " + damageDealt + " damage!");
             }
+
+            // Equip Item
             else if (choice == 1)
             {
                 DisplayEquipItemMenu();
@@ -450,13 +475,14 @@ namespace MyAdventureGame
                 Console.Clear();
                 return;
             }
+
+            // Unequip Item
             else if (choice == 2)
             {
                 if (!_player.TryRemoveCurrentItem())
                 {
                     Console.WriteLine("You don't have anything equipped.");
                 }
-
                 else
                 {
                     Console.WriteLine("You placed the item in your bag.");
@@ -466,6 +492,8 @@ namespace MyAdventureGame
                 Console.Clear();
                 return;
             }
+
+            // Save
             else if (choice == 3)
             {
                 // Called the Save function 
@@ -480,6 +508,7 @@ namespace MyAdventureGame
 
             damageDealt = _currentEnemy.Attack(_player);
             Console.WriteLine("The " + _currentEnemy.Name + " dealt " + damageDealt, " damage!");
+
 
             Console.ReadKey(true);
             Console.Clear();
