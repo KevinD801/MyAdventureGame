@@ -12,7 +12,6 @@ namespace MyAdventureGame
         SELECTION,
         STORY,
         BATTLE,
-        AFTERBATTLE,
         RESTART
     }
     public struct Item
@@ -149,9 +148,6 @@ namespace MyAdventureGame
                 case Scene.BATTLE:
                     Battle();
                     CheckBattleResults();
-                    break;
-                case Scene.AFTERBATTLE:
-                    AfterBattle();
                     break;
                 case Scene.RESTART:
                     DisplayRestartMenu();
@@ -290,7 +286,7 @@ namespace MyAdventureGame
 
             if (input == 0)
             {
-                Console.WriteLine("You surrender into depression like there no hope enemies notice your presence you been slained." + "\n");
+                Console.WriteLine("You surrender into depression like there no hope, but enemies notice your presence you been slained." + "\n");
                 _currentScene = Scene.RESTART;
             }
             else if (input == 1)
@@ -356,7 +352,9 @@ namespace MyAdventureGame
         }
 
 
-
+        /// <summary>
+        /// Create a new stream writer for player for save
+        /// </summary>
         public void Save()
         {
             // Create a new stream writer
@@ -373,6 +371,10 @@ namespace MyAdventureGame
             writer.Close();
         }
 
+        /// <summary>
+        /// Create a new stream writer for player for load
+        /// </summary>
+        /// <returns></returns>
         public bool Load()
         {
             bool loadSuccessful = true;
@@ -530,26 +532,6 @@ namespace MyAdventureGame
             
             Console.ReadKey(true);
             Console.Clear();
-        }
-
-        /// <summary>
-        /// AfterBattle supposed to do is when Battle function end 
-        /// </summary>
-        void AfterBattle()
-        {
-            int input = GetInput("You defeated all monster, but one remained can you solve this riddle.",
-                "Yes", "No");
-
-            if (input == 0)
-            {
-                _currentScene++;
-            }
-            else if (input == 1)
-            {
-                Console.WriteLine("You ingored riddle." + "\n");
-                _currentScene = Scene.RESTART;
-
-            }
         }
 
         /// <summary>

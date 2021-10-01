@@ -32,6 +32,9 @@ namespace MyAdventureGame
             get { return _defensePower; }
         }
 
+        /// <summary>
+        /// Initialize any starting values by default
+        /// </summary>
         public Entity()
         {
             _name = "Default";
